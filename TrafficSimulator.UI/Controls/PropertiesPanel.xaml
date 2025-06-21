@@ -1,0 +1,88 @@
+﻿<UserControl x:Class="TrafficSimulator.UI.Controls.PropertiesPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:TrafficSimulator.UI.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="300">
+    <Grid>
+        <!-- Panel de propiedades generales cuando no hay nada seleccionado -->
+        <StackPanel x:Name="GeneralPropertiesPanel">
+            <TextBlock Text="Propiedades generales" 
+                       FontWeight="Bold" FontSize="18"
+                       Margin="0,0,0,16"/>
+
+            <TextBlock Text="No hay elementos seleccionados" Margin="0,0,0,8"/>
+
+            <Expander Header="Configuración de la simulación" Margin="0,8">
+                <StackPanel Margin="8">
+                    <TextBlock Text="Velocidad de simulación:" Margin="0,8,0,0"/>
+                    <Slider x:Name="SliderSimulationSpeed" Minimum="0.1" Maximum="5" Value="1" 
+                            TickFrequency="0.1" TickPlacement="BottomRight"/>
+
+                    <TextBlock Text="Cantidad de vehículos:" Margin="0,8,0,0"/>
+                    <Slider x:Name="SliderVehicleCount" Minimum="10" Maximum="500" Value="50"
+                            TickFrequency="10" TickPlacement="BottomRight"/>
+
+                    <TextBlock Text="Factor de tráfico global:" Margin="0,8,0,0"/>
+                    <Slider x:Name="SliderTrafficFactor" Minimum="0" Maximum="10" Value="1"
+                            TickFrequency="0.1" TickPlacement="BottomRight"/>
+                </StackPanel>
+            </Expander>
+        </StackPanel>
+
+        <!-- Panel de propiedades de ciudad -->
+        <StackPanel x:Name="CityPropertiesPanel" Visibility="Collapsed">
+            <TextBlock Text="Propiedades de ciudad" 
+                       FontWeight="Bold" FontSize="18"
+                       Margin="0,0,0,16"/>
+
+            <TextBlock Text="Nombre:"/>
+            <TextBox x:Name="TxtCityName" Margin="0,0,0,8"/>
+
+            <TextBlock Text="Posición X:"/>
+            <TextBox x:Name="TxtCityPositionX" Margin="0,0,0,8"/>
+
+            <TextBlock Text="Posición Y:"/>
+            <TextBox x:Name="TxtCityPositionY" Margin="0,0,0,8"/>
+
+            <TextBlock Text="Factor de tráfico:"/>
+            <Slider x:Name="SliderCityTrafficFactor" Minimum="0" Maximum="10" Value="1" 
+                    TickFrequency="0.1" TickPlacement="BottomRight" Margin="0,0,0,16"/>
+
+            <Button Content="Eliminar ciudad" BorderBrush="Red" Foreground="Red" Margin="0,8"/>
+        </StackPanel>
+
+        <!-- Panel de propiedades de carretera -->
+        <StackPanel x:Name="RoadPropertiesPanel" Visibility="Collapsed">
+            <TextBlock Text="Propiedades de carretera" 
+                       FontWeight="Bold" FontSize="18"
+                       Margin="0,0,0,16"/>
+
+            <TextBlock Text="Nombre:"/>
+            <TextBox x:Name="TxtRoadName" Margin="0,0,0,8"/>
+
+            <TextBlock Text="Ciudad origen:"/>
+            <TextBlock x:Name="TxtRoadSource" Margin="0,0,0,8"/>
+
+            <TextBlock Text="Ciudad destino:"/>
+            <TextBlock x:Name="TxtRoadDestination" Margin="0,0,0,8"/>
+
+            <TextBlock Text="Distancia:"/>
+            <TextBlock x:Name="TxtRoadDistance" Margin="0,0,0,8"/>
+
+            <TextBlock Text="Carga de tráfico:"/>
+            <Slider x:Name="SliderRoadTrafficLoad" Minimum="0" Maximum="10" Value="0" 
+                    TickFrequency="0.1" TickPlacement="BottomRight" Margin="0,0,0,8"/>
+
+            <CheckBox x:Name="ChkRoadBlocked" Content="Carretera bloqueada" Margin="0,8"/>
+
+            <TextBlock Text="Motivo del bloqueo:"/>
+            <TextBox x:Name="TxtRoadBlockReason" Margin="0,0,0,16" 
+                     IsEnabled="{Binding ElementName=ChkRoadBlocked, Path=IsChecked}"/>
+
+            <Button Content="Eliminar carretera" BorderBrush="Red" Foreground="Red" Margin="0,8"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

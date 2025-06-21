@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35931.197 d17.13
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrafficSimulator.UI", "TrafficSimulator.UI\TrafficSimulator.UI.csproj", "{224FBCBD-69E3-44A5-9A59-D6CB252C9DC0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrafficSimulator.Core", "TrafficSimulator.Core\TrafficSimulator.Core.csproj", "{443042D6-0905-40B4-B846-B565F87764AD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrafficSimulator.Tests", "TrafficSimulator.Tests\TrafficSimulator.Tests.csproj", "{54199F2B-C22C-45B0-866B-92A50FFE1D3A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{224FBCBD-69E3-44A5-9A59-D6CB252C9DC0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{224FBCBD-69E3-44A5-9A59-D6CB252C9DC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{224FBCBD-69E3-44A5-9A59-D6CB252C9DC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{224FBCBD-69E3-44A5-9A59-D6CB252C9DC0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{443042D6-0905-40B4-B846-B565F87764AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{443042D6-0905-40B4-B846-B565F87764AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{443042D6-0905-40B4-B846-B565F87764AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{443042D6-0905-40B4-B846-B565F87764AD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{54199F2B-C22C-45B0-866B-92A50FFE1D3A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{54199F2B-C22C-45B0-866B-92A50FFE1D3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{54199F2B-C22C-45B0-866B-92A50FFE1D3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{54199F2B-C22C-45B0-866B-92A50FFE1D3A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8A1897BB-BC5B-499C-A85D-E59CD6B53E65}
+	EndGlobalSection
+EndGlobal
