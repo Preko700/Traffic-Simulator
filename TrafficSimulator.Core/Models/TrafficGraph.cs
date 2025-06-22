@@ -115,8 +115,6 @@ namespace TrafficSimulator.Core.Models
         }
 
         // Implementación del algoritmo Dijkstra
-        // Implementación del algoritmo Dijkstra
-        // Implementación del algoritmo Dijkstra
         public List<Road> GetShortestPath(City source, City destination)
         {
             if (source == null || destination == null)
