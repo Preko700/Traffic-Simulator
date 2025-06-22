@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Threading;
 using System.Xml.Linq;
 using TrafficSimulator.Core.Models;
@@ -260,7 +261,6 @@ namespace TrafficSimulator.UI
                 txtStatus.Text = "Grafo eliminado";
             }
         }
-
         private void ShowCriticalPoints()
         {
             if (_viewModel.TrafficGraph.Cities.Count < 2 || _viewModel.TrafficGraph.Roads.Count < 1)
@@ -270,23 +270,40 @@ namespace TrafficSimulator.UI
                 return;
             }
 
-            // Fix Problem 2: Since CriticalPointsWindow isn't found, use a basic MessageBox display instead
-            var criticalRoads = _viewModel.GetMostUsedRoadsViaDijkstra(3);
+            // Cambiar el cursor para indicar procesamiento
+            Cursor = Cursors.Wait;
+            txtStatus.Text = "Analizando puntos críticos...";
 
-            if (criticalRoads.Count == 0)
+            try
             {
-                MessageBox.Show("No se encontraron puntos críticos.", "Puntos críticos", MessageBoxButton.OK, MessageBoxImage.Information);
-                return;
-            }
+                // Pre-calcular datos para análisis si es necesario
+                _viewModel.UpdateTrafficLoad();
 
-            string message = "Los caminos más utilizados en rutas óptimas son:\n\n";
-            foreach (var road in criticalRoads)
+                // Restaurar el cursor
+                Cursor = Cursors.Arrow;
+                txtStatus.Text = "Mostrando análisis de puntos críticos";
+
+                // Crear y mostrar la ventana de puntos críticos
+                var criticalPointsWindow = new CriticalPointsWindow(_viewModel);
+                criticalPointsWindow.Owner = this;
+                criticalPointsWindow.ShowDialog();
+
+                // Actualizar la vista después de cerrar
+                _graphEditor.UpdateCanvasFromViewModel();
+                UpdateStatusBar();
+                txtStatus.Text = "Análisis de puntos críticos completado";
+            }
+            catch (Exception ex)
             {
-                message += $"- {road.SourceCity.Name} → {road.DestinationCity.Name} (Distancia: {road.Distance})\n";
+                // Restaurar el cursor en caso de error
+                Cursor = Cursors.Arrow;
+                MessageBox.Show($"Error al mostrar la ventana de puntos críticos: {ex.Message}",
+                               "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                txtStatus.Text = "Error al analizar puntos críticos";
             }
-
-            MessageBox.Show(message, "Puntos críticos", MessageBoxButton.OK, MessageBoxImage.Information);
         }
+
+
 
         private void ShowRecommendations()
         {
