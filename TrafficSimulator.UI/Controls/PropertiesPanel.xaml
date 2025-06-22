@@ -51,7 +51,7 @@
             <Slider x:Name="SliderCityTrafficFactor" Minimum="0" Maximum="10" Value="1" 
                     TickFrequency="0.1" TickPlacement="BottomRight" Margin="0,0,0,16"/>
 
-            <Button Content="Eliminar ciudad" BorderBrush="Red" Foreground="Red" Margin="0,8"/>
+            <Button Content="Actualizar Cuidad" BorderBrush="Blue" Foreground="Blue" Margin="0,8"/>
         </StackPanel>
 
         <!-- Panel de propiedades de carretera -->
@@ -82,7 +82,7 @@
             <TextBox x:Name="TxtRoadBlockReason" Margin="0,0,0,16" 
                      IsEnabled="{Binding ElementName=ChkRoadBlocked, Path=IsChecked}"/>
 
-            <Button Content="Eliminar carretera" BorderBrush="Red" Foreground="Red" Margin="0,8"/>
+            <Button Content="Actualizar carretera" BorderBrush="Blue" Foreground="Blue" Margin="0,8"/>
         </StackPanel>
     </Grid>
 </UserControl>
