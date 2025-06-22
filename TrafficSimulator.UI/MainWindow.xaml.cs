@@ -10,6 +10,8 @@ using System.Xml.Linq;
 using TrafficSimulator.Core.Models;
 using TrafficSimulator.UI.Controls;
 using TrafficSimulator.UI.ViewModels;
+using TrafficSimulator.UI.Views;
+
 
 namespace TrafficSimulator.UI
 {
@@ -82,7 +84,8 @@ namespace TrafficSimulator.UI
             }
             else if (e.PropertyName == nameof(MainViewModel.SelectedElement))
             {
-                _propertiesPanel.SelectedElement = _viewModel.SelectedElement;
+                // Fix Problem 1: Handle possible null reference by ensuring we're not assigning null
+                _propertiesPanel.SelectedElement = _viewModel.SelectedElement ?? new object();
             }
             else if (e.PropertyName == nameof(MainViewModel.SelectedVehicle))
             {
@@ -235,7 +238,7 @@ namespace TrafficSimulator.UI
                 return;
             }
 
-            selectedElement = null;
+            _viewModel.SelectedElement = null;
 
             // Actualizar UI
             _graphEditor.UpdateCanvasFromViewModel();
@@ -260,6 +263,14 @@ namespace TrafficSimulator.UI
 
         private void ShowCriticalPoints()
         {
+            if (_viewModel.TrafficGraph.Cities.Count < 2 || _viewModel.TrafficGraph.Roads.Count < 1)
+            {
+                MessageBox.Show("Se necesitan al menos 2 ciudades y 1 carretera para generar puntos críticos.",
+                                "Datos insuficientes", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            // Fix Problem 2: Since CriticalPointsWindow isn't found, use a basic MessageBox display instead
             var criticalRoads = _viewModel.GetMostUsedRoadsViaDijkstra(3);
 
             if (criticalRoads.Count == 0)
@@ -279,22 +290,31 @@ namespace TrafficSimulator.UI
 
         private void ShowRecommendations()
         {
-            var recommendations = _viewModel.GetMostRequestedCityPairsWithoutRoad(3);
-
-            if (recommendations.Count == 0)
+            if (_viewModel.TrafficGraph.Cities.Count < 2)
             {
-                MessageBox.Show("No se encontraron recomendaciones de nuevas rutas.", "Recomendaciones", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("Se necesitan al menos 2 ciudades para generar recomendaciones.",
+                                "Datos insuficientes", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
-            string message = "Se recomienda agregar conexión entre:\n\n";
-            foreach (var pair in recommendations)
+            // Crear y mostrar la ventana de recomendaciones
+            try
             {
-                message += $"- {pair.Item1.Name} ↔ {pair.Item2.Name}\n";
-            }
+                var recommendationsWindow = new RecommendationsWindow(_viewModel);
+                recommendationsWindow.Owner = this; // Establece MainWindow como ventana propietaria
+                recommendationsWindow.ShowDialog(); // Muestra como diálogo modal
 
-            MessageBox.Show(message, "Recomendaciones", MessageBoxButton.OK, MessageBoxImage.Information);
+                // Actualizar la vista después de cerrar si se realizaron cambios
+                _graphEditor.UpdateCanvasFromViewModel();
+                UpdateStatusBar();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error al mostrar la ventana de recomendaciones: {ex.Message}",
+                               "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
+
 
         private void ShowAbout()
         {
