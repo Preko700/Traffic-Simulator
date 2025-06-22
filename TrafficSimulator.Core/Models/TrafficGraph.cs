@@ -215,39 +215,46 @@ namespace TrafficSimulator.Core.Models
         }
 
         // Encontrar puntos críticos en el grafo
-        public List<CriticalPoint> FindCriticalPoints()
+        // Encontrar puntos críticos en el grafo
+        public List<CriticalPoint> FindCriticalPoints(int maxCount = 5)
         {
             var criticalPoints = new List<CriticalPoint>();
 
-            // Temporary implementation until FindCriticalNodes is available
-            var criticalNodes = new List<City>();
-            foreach (var node in criticalNodes)
+            // Análisis de ciudades críticas (nodos con alto grado de conectividad)
+            var citiesByConnectivity = Cities.Select(city => new
             {
-                var connectedRoads = Roads.Count(r =>
-                    r.SourceCity.Id == node.Id || r.DestinationCity.Id == node.Id);
+                City = city,
+                ConnectedRoads = Roads.Count(r => r.SourceCity.Id == city.Id || r.DestinationCity.Id == city.Id),
+                TotalTraffic = Roads.Where(r => r.SourceCity.Id == city.Id || r.DestinationCity.Id == city.Id)
+                                   .Sum(r => r.TrafficLoad)
+            }).OrderByDescending(c => c.ConnectedRoads * c.TotalTraffic).Take(maxCount);
 
+            foreach (var cityInfo in citiesByConnectivity)
+            {
                 criticalPoints.Add(new CriticalPoint(
-                    node,
-                    connectedRoads * 10, // Severity basada en número de conexiones
-                    $"Nodo con {connectedRoads} conexiones",
-                    "Considerar construcción de bypass o mejora de infraestructura"
+                    cityInfo.City,
+                    cityInfo.ConnectedRoads * cityInfo.TotalTraffic * 10, // Factor de severidad
+                    $"Ciudad con {cityInfo.ConnectedRoads} conexiones y tráfico acumulado {cityInfo.TotalTraffic:F2}",
+                    "Considerar construcción de bypass o ampliación de rutas de acceso"
                 ));
             }
 
-            // Temporary implementation until FindCriticalRoads is available
-            var criticalRoads = new List<Road>();
+            // Análisis de carreteras críticas (alta carga de tráfico)
+            var criticalRoads = Roads.OrderByDescending(r => r.TrafficLoad).Take(maxCount);
             foreach (var road in criticalRoads)
             {
                 criticalPoints.Add(new CriticalPoint(
-                    road.SourceCity,
-                    road.TrafficLoad * 20,
-                    $"Alta carga de tráfico: {road.TrafficLoad:F2}",
+                    road.SourceCity,  // Usamos la ciudad origen como ubicación del punto crítico
+                    road.TrafficLoad * 20,  // Factor de severidad
+                    $"Alta carga de tráfico: {road.TrafficLoad:F2} en ruta {road.Name}",
                     $"Considerar ampliación de la carretera {road.Name}"
                 ));
             }
 
-            return criticalPoints.OrderByDescending(cp => cp.Severity).ToList();
+            // Retornar los puntos más críticos
+            return criticalPoints.OrderByDescending(cp => cp.Severity).Take(maxCount).ToList();
         }
+
 
         public void ResetTrafficLoad()
         {

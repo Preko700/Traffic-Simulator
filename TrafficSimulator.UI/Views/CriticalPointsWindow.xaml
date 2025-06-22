@@ -1,0 +1,72 @@
+﻿<Window x:Class="TrafficSimulator.UI.Views.CriticalPointsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Análisis de Puntos Críticos" Height="500" Width="800">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="Análisis de Puntos Críticos" 
+                   FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
+
+        <TabControl Grid.Row="1">
+            <TabItem Header="Carreteras Críticas">
+                <ListView Name="roadsListView" SelectionMode="Single">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="Origen" Width="120" 
+                                            DisplayMemberBinding="{Binding Source}"/>
+                            <GridViewColumn Header="Destino" Width="120" 
+                                            DisplayMemberBinding="{Binding Destination}"/>
+                            <GridViewColumn Header="Uso" Width="80" 
+                                            DisplayMemberBinding="{Binding UsageLevel}"/>
+                            <GridViewColumn Header="Carga Tráfico" Width="100" 
+                                            DisplayMemberBinding="{Binding TrafficLoad, StringFormat=P1}"/>
+                            <GridViewColumn Header="Recomendación" Width="300" 
+                                            DisplayMemberBinding="{Binding Recommendation}"/>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </TabItem>
+            <TabItem Header="Ciudades Críticas">
+                <ListView Name="citiesListView">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="Ciudad" Width="120" 
+                                            DisplayMemberBinding="{Binding City}"/>
+                            <GridViewColumn Header="Conexiones" Width="80" 
+                                            DisplayMemberBinding="{Binding Connections}"/>
+                            <GridViewColumn Header="Nivel Crítico" Width="100" 
+                                            DisplayMemberBinding="{Binding CriticalLevel, StringFormat=P1}"/>
+                            <GridViewColumn Header="Recomendación" Width="350" 
+                                            DisplayMemberBinding="{Binding Recommendation}"/>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </TabItem>
+            <TabItem Header="Visualización">
+                <Grid>
+                    <TextBlock Text="En una futura versión, se mostrará un mapa de calor visual del tráfico" 
+                               HorizontalAlignment="Center" VerticalAlignment="Center"
+                               FontStyle="Italic" Foreground="Gray"/>
+                </Grid>
+            </TabItem>
+        </TabControl>
+
+        <StackPanel Grid.Row="2" Margin="0,10,0,10">
+            <TextBlock Text="Informe de tráfico" FontWeight="Bold"/>
+            <TextBlock Name="txtSummary" TextWrapping="Wrap"
+                       Text="Análisis de los patrones de tráfico basados en la simulación actual. El sistema ha identificado varios puntos críticos que requieren atención."/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="Destacar en el mapa" Margin="0,0,10,0" Padding="10,5" Name="btnHighlight" Click="HighlightButton_Click"/>
+            <Button Content="Generar informe" Margin="0,0,10,0" Padding="10,5" Name="btnReport" Click="ReportButton_Click"/>
+            <Button Content="Cerrar" Padding="10,5" Click="CloseButton_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

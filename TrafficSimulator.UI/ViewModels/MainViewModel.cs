@@ -386,9 +386,11 @@ namespace TrafficSimulator.UI.ViewModels
 
         public List<Road> GetMostUsedRoadsViaDijkstra(int top = 3)
         {
-            var roadUsage = new Dictionary<Guid, int>(); 
-
+            var roadUsage = new Dictionary<Guid, int>();
             var cities = _trafficGraph.Cities.ToList();
+
+            // Create a proper weight system for ranking
+            var totalPaths = 0;
 
             foreach (var origin in cities)
             {
@@ -396,25 +398,40 @@ namespace TrafficSimulator.UI.ViewModels
                 {
                     if (origin == destination) continue;
 
-                    var route = _trafficGraph.GetShortestPath(origin, destination); 
-                    if (route == null) continue;
+                    var route = _trafficGraph.GetShortestPath(origin, destination);
+                    if (route == null || !route.Any()) continue;
+
+                    totalPaths++;
+
+                    // Compute importance factor based on cities' traffic factors
+                    double importanceFactor = 1.0 + (origin.TrafficFactor + destination.TrafficFactor) / 2.0;
 
                     foreach (var road in route)
                     {
                         if (roadUsage.ContainsKey(road.Id))
-                            roadUsage[road.Id]++;
+                            roadUsage[road.Id] += (int)(1 * importanceFactor);
                         else
-                            roadUsage[road.Id] = 1;
+                            roadUsage[road.Id] = (int)(1 * importanceFactor);
                     }
                 }
             }
 
-            return _trafficGraph.Roads
+            // Combine usage count with traffic load for more accurate ranking
+            var roadRanking = _trafficGraph.Roads
                 .Where(r => roadUsage.ContainsKey(r.Id))
-                .OrderByDescending(r => roadUsage[r.Id])
+                .Select(r => new
+                {
+                    Road = r,
+                    Score = roadUsage[r.Id] * (1 + r.TrafficLoad)
+                })
+                .OrderByDescending(item => item.Score)
+                .Select(item => item.Road)
                 .Take(top)
                 .ToList();
+
+            return roadRanking;
         }
+
 
         public List<Tuple<City, City>> GetRecommendedNewRoads()
         {

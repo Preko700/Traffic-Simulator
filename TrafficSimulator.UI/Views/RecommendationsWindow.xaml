@@ -1,0 +1,32 @@
+﻿<Window x:Class="TrafficSimulator.UI.Views.RecommendationsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Recomendaciones" Height="400" Width="600">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="Recomendaciones de Nuevas Rutas" 
+                   FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
+
+        <ListView Grid.Row="1" Name="recommendationsListView">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Origen" Width="120" DisplayMemberBinding="{Binding Source}"/>
+                    <GridViewColumn Header="Destino" Width="120" DisplayMemberBinding="{Binding Destination}"/>
+                    <GridViewColumn Header="Beneficio Estimado" Width="120" DisplayMemberBinding="{Binding Benefit}"/>
+                    <GridViewColumn Header="Justificación" Width="200" DisplayMemberBinding="{Binding Justification}"/>
+                </GridView>
+            </ListView.View>
+        </ListView>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+            <Button Content="Implementar Recomendación" Padding="10,5" 
+                    Margin="0,0,10,0" Click="ImplementButton_Click" Name="implementButton"/>
+            <Button Content="Cerrar" Padding="10,5" Click="CloseButton_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>
