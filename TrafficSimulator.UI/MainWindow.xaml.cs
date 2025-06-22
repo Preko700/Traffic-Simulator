@@ -1,10 +1,12 @@
-﻿using System;
+﻿using QuikGraph;
+using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
+using System.Xml.Linq;
 using TrafficSimulator.Core.Models;
 using TrafficSimulator.UI.Controls;
 using TrafficSimulator.UI.ViewModels;
@@ -201,31 +203,102 @@ namespace TrafficSimulator.UI
 
         private void DeleteSelectedElement()
         {
-            // Implementación pendiente
-            MessageBox.Show("Función no implementada", "Eliminar elemento", MessageBoxButton.OK, MessageBoxImage.Information);
+            var selectedElement = _viewModel.SelectedElement;
+            if (selectedElement == null)
+            {
+                MessageBox.Show("No hay ningún elemento seleccionado", "Eliminar elemento", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (selectedElement is City selectedCity)
+            {
+                // Eliminar todas las carreteras conectadas a esta ciudad
+                var connectedRoads = _viewModel.TrafficGraph.Roads
+                    .Where(r => r.SourceCity == selectedCity || r.DestinationCity == selectedCity)
+                    .ToList();
+
+                foreach (var road in connectedRoads)
+                {
+                    _viewModel.TrafficGraph.Roads.Remove(road);
+                }
+
+                // Eliminar la ciudad
+                _viewModel.TrafficGraph.Cities.Remove(selectedCity);
+            }
+            else if (selectedElement is Road selectedRoad)
+            {
+                _viewModel.TrafficGraph.Roads.Remove(selectedRoad);
+            }
+            else
+            {
+                MessageBox.Show("El elemento seleccionado no es válido para eliminar.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            selectedElement = null;
+
+            // Actualizar UI
+            _graphEditor.UpdateCanvasFromViewModel();
+            UpdateStatusBar();
         }
 
         private void ClearAll()
         {
-            // Implementación pendiente
-            MessageBox.Show("Función no implementada", "Limpiar todo", MessageBoxButton.OK, MessageBoxImage.Information);
+            if (MessageBox.Show("¿Estás seguro de que deseas eliminar todo el grafo?", "Confirmar", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+            {
+                // Limpiar el grafo a través del ViewModel
+                _viewModel.TrafficGraph.Cities.Clear();
+                _viewModel.TrafficGraph.Roads.Clear();
+                _viewModel.SelectedElement = null;
+
+                // Actualizar el canvas y el estado
+                _graphEditor.UpdateCanvasFromViewModel();
+                UpdateStatusBar();
+                txtStatus.Text = "Grafo eliminado";
+            }
         }
 
         private void ShowCriticalPoints()
         {
-            // Implementación pendiente
-            MessageBox.Show("Función no implementada", "Puntos críticos", MessageBoxButton.OK, MessageBoxImage.Information);
+            var criticalRoads = _viewModel.GetMostUsedRoadsViaDijkstra(3);
+
+            if (criticalRoads.Count == 0)
+            {
+                MessageBox.Show("No se encontraron puntos críticos.", "Puntos críticos", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            string message = "Los caminos más utilizados en rutas óptimas son:\n\n";
+            foreach (var road in criticalRoads)
+            {
+                message += $"- {road.SourceCity.Name} → {road.DestinationCity.Name} (Distancia: {road.Distance})\n";
+            }
+
+            MessageBox.Show(message, "Puntos críticos", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         private void ShowRecommendations()
         {
-            // Implementación pendiente
-            MessageBox.Show("Función no implementada", "Recomendaciones", MessageBoxButton.OK, MessageBoxImage.Information);
+            var recommendations = _viewModel.GetMostRequestedCityPairsWithoutRoad(3);
+
+            if (recommendations.Count == 0)
+            {
+                MessageBox.Show("No se encontraron recomendaciones de nuevas rutas.", "Recomendaciones", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            string message = "Se recomienda agregar conexión entre:\n\n";
+            foreach (var pair in recommendations)
+            {
+                message += $"- {pair.Item1.Name} ↔ {pair.Item2.Name}\n";
+            }
+
+            MessageBox.Show(message, "Recomendaciones", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         private void ShowAbout()
         {
-            MessageBox.Show("Traffic Simulator\nVersión 1.0\n© 2023", "Acerca de", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show("Traffic Simulator\nVersión 1.0\n© 2025", "Acerca de", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         private void UpdateStatusBar()

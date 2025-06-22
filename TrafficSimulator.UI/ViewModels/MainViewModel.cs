@@ -33,6 +33,7 @@ namespace TrafficSimulator.UI.ViewModels
         public TrafficGraph TrafficGraph => _trafficGraph;
         public ObservableCollection<Vehicle> Vehicles => _vehicles;
         public SimulationSettings SimulationSettings => _simulationSettings;
+        public ObservableCollection<CriticalPoint> CriticalPoints { get; } = new();
 
         public Vehicle? SelectedVehicle
         {
@@ -383,6 +384,38 @@ namespace TrafficSimulator.UI.ViewModels
                 .ToList();
         }
 
+        public List<Road> GetMostUsedRoadsViaDijkstra(int top = 3)
+        {
+            var roadUsage = new Dictionary<Guid, int>(); 
+
+            var cities = _trafficGraph.Cities.ToList();
+
+            foreach (var origin in cities)
+            {
+                foreach (var destination in cities)
+                {
+                    if (origin == destination) continue;
+
+                    var route = _trafficGraph.GetShortestPath(origin, destination); 
+                    if (route == null) continue;
+
+                    foreach (var road in route)
+                    {
+                        if (roadUsage.ContainsKey(road.Id))
+                            roadUsage[road.Id]++;
+                        else
+                            roadUsage[road.Id] = 1;
+                    }
+                }
+            }
+
+            return _trafficGraph.Roads
+                .Where(r => roadUsage.ContainsKey(r.Id))
+                .OrderByDescending(r => roadUsage[r.Id])
+                .Take(top)
+                .ToList();
+        }
+
         public List<Tuple<City, City>> GetRecommendedNewRoads()
         {
             var recommendations = new List<Tuple<City, City>>();
@@ -423,6 +456,49 @@ namespace TrafficSimulator.UI.ViewModels
             }
 
             return recommendations;
+        }
+
+        public List<Tuple<City, City>> GetMostRequestedCityPairsWithoutRoad(int top = 3)
+        {
+            var cities = _trafficGraph.Cities.ToList();
+            var pairCount = new Dictionary<(Guid, Guid), int>();
+
+            foreach (var origin in cities)
+            {
+                foreach (var destination in cities)
+                {
+                    if (origin == destination) continue;
+
+                    bool connected = _trafficGraph.Roads.Any(r =>
+                        (r.SourceCity == origin && r.DestinationCity == destination) ||
+                        (r.SourceCity == destination && r.DestinationCity == origin));
+
+                    if (connected) continue;
+
+                    var route = _trafficGraph.GetShortestPath(origin, destination);
+                    if (route == null) continue;
+
+                    var key = origin.Id.CompareTo(destination.Id) < 0
+                        ? (origin.Id, destination.Id)
+                        : (destination.Id, origin.Id);
+
+                    if (pairCount.ContainsKey(key))
+                        pairCount[key]++;
+                    else
+                        pairCount[key] = 1;
+                }
+            }
+
+            return pairCount
+                .OrderByDescending(p => p.Value)
+                .Take(top)
+                .Select(p =>
+                {
+                    var cityA = cities.First(c => c.Id == p.Key.Item1);
+                    var cityB = cities.First(c => c.Id == p.Key.Item2);
+                    return Tuple.Create(cityA, cityB);
+                })
+                .ToList();
         }
 
         #region Helper Methods
